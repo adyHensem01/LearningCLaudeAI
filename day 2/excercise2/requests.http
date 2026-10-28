@@ -1,0 +1,96 @@
+### First Claude-powered API request to test the summarisation endpoint
+POST http://127.0.0.1:8000/summarise
+Content-Type: application/json
+
+{
+    "text": "My package was supposed to arrive yesterday. This is the third delivery problem I have had and I am frustrated. Can someone tell me where my order is?"
+}
+
+
+### Test /analysis endpoint (Delivery problem)
+POST http://127.0.0.1:8000/analyse
+Content-Type: application/json
+
+{
+  "message": "My package was supposed to arrive yesterday and I still do not have it. Can you tell me where it is? "
+}
+
+### Test /analysis endpoint (return/refund)
+POST http://127.0.0.1:8000/analyse
+Content-Type: application/json
+
+{
+  "message": "I bought the wrong size. Can I return it, and how do I get my money back?"
+}
+
+### Test /analysis endpoint (billing issue)
+POST http://127.0.0.1:8000/analyse
+Content-Type: application/json
+
+{
+  "message": "I have been charged twice for the same purchase. Please help me fix this."
+}
+
+### Test /analysis endpoint (Account/escalation)
+POST http://127.0.0.1:8000/analyse
+Content-Type: application/json
+
+{
+  "message": "I have contacted support twice and nobody has helped. I need somebody to review this properly because I cannot access my account. "
+}
+
+### Test /analysis endpoint (Short message, HTTP 422)
+POST http://127.0.0.1:8000/analyse
+Content-Type: application/json
+
+{
+  "message": "Hi"
+}
+
+
+### Test /analysis endpoint (unknown field, Because StrictModel forbids extras, this should fail validation.)
+POST http://127.0.0.1:8000/analyse
+Content-Type: application/json
+
+{
+  "message": "My order is late.",
+  "force_priority": "urgent"
+}
+
+
+### Test /generate-response endpoint
+POST http://127.0.0.1:8000/generate-response
+Content-Type: application/json
+
+{
+  "customer_message": "My order was due yesterday and I am frustrated because it still has not arrived."
+}
+
+### Exercise 02 case 1: valid customer + order pair (trusted context used)
+POST http://127.0.0.1:8000/generate-response
+Content-Type: application/json
+
+{
+  "customer_message": "Where is my order? It should have arrived by now.",
+  "customer_id": "CUST-101",
+  "order_id": "ORD-1001"
+}
+
+### Exercise 02 case 2: same order under a different customer (no trusted context)
+POST http://127.0.0.1:8000/generate-response
+Content-Type: application/json
+
+{
+  "customer_message": "Where is my order? It should have arrived by now.",
+  "customer_id": "CUST-102",
+  "order_id": "ORD-1001"
+}
+
+### Exercise 02 case 3: order ID without customer ID (HTTP 422, no Claude call)
+POST http://127.0.0.1:8000/generate-response
+Content-Type: application/json
+
+{
+  "customer_message": "Where is my order? It should have arrived by now.",
+  "order_id": "ORD-1001"
+}
